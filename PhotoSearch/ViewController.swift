@@ -66,7 +66,8 @@ class ViewController: UIViewController, UISearchBarDelegate{
      
      func searchBarSearchButtonClicked(_ searchBar: UISearchBar){
           searchBar.resignFirstResponder()
-          if let text = searchBar.text{
+          if var text = searchBar.text{
+               text = text.filter { $0 != " "}
                results = []
                getPhotos(query: text)
           }

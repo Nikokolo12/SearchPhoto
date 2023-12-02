@@ -7,13 +7,15 @@
 
 import UIKit
 
+var imageCache = NSCache<NSURL, UIImage>()
+
 class PhotoCollectionViewCell: UICollectionViewCell {
     static let identifier = "photo"
     
     private let imageView: UIImageView = {
         let image = UIImageView()
         image.clipsToBounds = true
-        image.contentMode = .scaleAspectFit
+        image.contentMode = .scaleAspectFill
         return image
     }()
     
@@ -41,14 +43,22 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     }
     
     func loadPhotos(urlString: String){
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url){ [weak self] data, _, error in
-            guard let self = self,
-                  let data = data,
-                  error == nil else{ return }
-            let image = UIImage(data: data)
+        guard let url = NSURL(string: urlString) else{ return }
+        
+        if let image = imageCache.object(forKey: url) {
             self.imageView.image = image
-        }.resume()
-    }
-    
-}
+        }
+        
+        URLSession.shared.dataTask(with: url as URL){ [weak self] data, _, error in
+                    guard let self = self,
+                          let data = data,
+                          error == nil else{ return }
+                    
+                    DispatchQueue.main.async {
+                        let image = UIImage(data: data)
+                        imageCache.setObject(image!, forKey: url)
+                        self.imageView.image = image
+                    }
+                }.resume()
+            }
+        }

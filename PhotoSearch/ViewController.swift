@@ -48,8 +48,6 @@ class ViewController: UIViewController, UISearchBarDelegate{
           self.collectionView = collectionView
           collectionView.dataSource = self
           collectionView.delegate = self
-          
-          
          
           searchBar.delegate = self
           view.addSubview(searchBar)
@@ -76,8 +74,8 @@ class ViewController: UIViewController, UISearchBarDelegate{
      
      func getPhotos(query: String){
           let urlString = "https://api.unsplash.com/search/photos?page=1&query=\(query)&client_id=eki44gUqIYUrmjl7kIuaLav7XaieMnmWk77xe8h3WGs"
-          guard let url = URL(string: urlString) else{ return }
-          let task = URLSession.shared.dataTask(with: url) {[weak self] data, _, error in
+          guard let url = NSURL(string: urlString) else{ return }
+          let task = URLSession.shared.dataTask(with: url as URL) {[weak self] data, _, error in
                guard let data = data, error == nil else { return }
                do {
                     let jsonResult = try JSONDecoder().decode(Response.self, from: data)
